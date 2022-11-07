@@ -1,8 +1,8 @@
-export CUDA_VISIBLE_DEVICES=5
+export CUDA_VISIBLE_DEVICES=4
 RootDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-#Dataset=LDC2020
-Dataset=LDC2017
+Dataset=LDC2020
+#Dataset=LDC2017
 
 BasePath=/home/gbf/AMR/graph_pretraining        # change dir here
 DataPath=/home/gbf/AMR_Dataset/AMR-Process_gp2022/outputs/$Dataset
@@ -13,9 +13,9 @@ MODEL=xfbai/AMRBART-large-v2
 ModelCache=$BasePath/.cache
 DataCache=$DataPath/.cache/dump-amrparsing
 
-lr=1e-5
+lr=8e-6
 
-OutputDir=${RootDir}/outputs/$Dataset-${ModelCate}-AMRParing-bsz16-lr-${lr}-UnifiedInp
+OutputDir=${RootDir}/outputs/$Dataset-${ModelCate}-AMRParing-bsz48-lr-${lr}-UnifiedInp
 
 if [ ! -d ${OutputDir} ];then
   mkdir -p ${OutputDir}
@@ -49,20 +49,20 @@ python -u main.py \
     --model_name_or_path $MODEL \
     --overwrite_output_dir \
     --unified_input True \
-    --per_device_train_batch_size 16 \
-    --per_device_eval_batch_size 8 \
-    --gradient_accumulation_steps 1 \
+    --per_device_train_batch_size 8 \
+    --per_device_eval_batch_size 4 \
+    --gradient_accumulation_steps 6 \
     --learning_rate $lr \
     --optim "adamw_hf" \
     --lr_scheduler_type "polynomial" \
     --warmup_steps 200 \
     --num_train_epochs 30 \
     --early_stopping 10 \
-    --max_source_length 400 \
+    --max_source_length 512 \
     --max_target_length 1024 \
     --val_max_target_length 1024 \
     --generation_max_length 1024 \
-    --generation_num_beams 5 \
+    --generation_num_beams 10 \
     --label_smoothing_factor 0.1 \
     --evaluation_strategy "epoch" \
     --weight_decay 0.01 \
